@@ -1,0 +1,526 @@
+Sub clean()
+Sheets("new").Activate
+Worksheets("new").Range("A2:z42").ClearContents 'scheme
+
+
+Worksheets("new").Range("AC2").ClearContents 'sex
+Worksheets("new").Range("Ae2").ClearContents 'ID
+Worksheets("new").Range("Ah2").ClearContents 'num_ajout
+Worksheets("new").Range("Aa2").ClearContents 'spot_number
+Worksheets("new").Range("AF6:AK50").ClearContents
+End Sub
+
+Public Function FeuilleExiste(FeuilleAVerifier) As Boolean
+
+
+On Error GoTo SiErreur
+Dim feuille As Worksheet
+    
+    FeuilleExiste = False
+    For Each feuille In Worksheets
+        If UCase(feuille.Name) = UCase(FeuilleAVerifier) Then
+            FeuilleExiste = True
+            Exit Function
+        End If
+    Next feuille
+Exit Function
+
+SiErreur:
+    FeuilleExiste = CVErr(xlErrNA)
+End Function
+Sub localisation()
+
+
+Workbooks("salamander.xlsm").Sheets("new").Activate
+Dim i, j, b, d, o, t, s, h As Integer
+Dim x, y As Integer
+Dim file, feuil As String
+
+
+i = 2
+j = 2
+b = 0
+
+file = Sheets("new").Range("AO2")
+feuil = Sheets("new").Range("AO4")
+Workbooks(file).Sheets(feuil).Activate
+
+
+Workbooks(file).Sheets(feuil).Activate
+
+
+
+x = Workbooks("salamander.xlsm").Sheets("new").Range("AO12") 'x
+y = Workbooks("salamander.xlsm").Sheets("new").Range("AO14") 'y
+
+
+d = Workbooks("salamander.xlsm").Sheets("new").Range("AO6") 'date position
+o = Workbooks("salamander.xlsm").Sheets("new").Range("AO8") 'observation number position
+t = Workbooks("salamander.xlsm").Sheets("new").Range("AO10") 'transect number position
+s = Workbooks("salamander.xlsm").Sheets("new").Range("AO16") 'ID individual position
+h = Workbooks("salamander.xlsm").Sheets("new").Range("AH2") 'ID individual
+
+
+
+While b < 1:
+    If Workbooks(file).Sheets(feuil).Cells(j, d) = Workbooks("salamander.xlsm").Sheets("new").Cells(2, 28) And _
+    Workbooks(file).Sheets(feuil).Cells(j, t) = Workbooks("salamander.xlsm").Sheets("new").Cells(2, 35) And _
+    Workbooks(file).Sheets(feuil).Cells(j, o) = Workbooks("salamander.xlsm").Sheets("new").Cells(2, 36) Then    'date puis transect puis num de photo
+    
+    
+        Workbooks(file).Sheets(feuil).Cells(j, x).Copy _
+            Destination:=Workbooks("salamander.xlsm").Sheets("new").Range("AL2") 'x position
+        Workbooks(file).Sheets(feuil).Cells(j, y).Copy _
+            Destination:=Workbooks("salamander.xlsm").Sheets("new").Range("AM2") 'y position
+        
+        b = 1
+    Else
+    j = j + 1
+    
+        
+    End If
+    
+
+Wend
+
+Workbooks("salamander.xlsm").Sheets("new").Activate
+
+End Sub
+
+
+Sub match()
+
+'improvements
+Application.ScreenUpdating = False
+Application.Calculation = xlManual
+Application.EnableEvents = False
+ActiveSheet.DisplayPageBreaks = False
+
+Dim a, s As Integer
+Dim x, y, t As Long
+a = 150
+s = 6
+x = Cells(2, 38)
+y = Cells(2, 39)
+
+
+
+
+
+Sheets("new").Activate
+
+'dist : ((xb-xa)²+(yb-ya)²)     Sqr((((Cells(a, 38) - x) ^ 2) - ((Cells(a, 39) - y) ^ 2)))
+
+
+If Range("M3") = 1 Then
+    If Range("L4") <> 0 Or Range("N4") <> 0 Then
+        MsgBox "Problem with the nose criteria"
+        Exit Sub
+    End If
+End If
+
+
+If Range("M3") = 2 Then
+    If Range("L4") = 0 Or Range("N4") = 0 Then
+        MsgBox "Problem with the nose criteria"
+        Exit Sub
+    End If
+End If
+    
+
+
+
+Do While Not IsEmpty(Cells(a, 29)) 'égal
+
+    
+        If Cells(2, 27) = Cells(a, 31) Then  'tache
+            If Cells(3, 13) = Cells(a, 32) Then 'nez
+                If Cells(9, 13) = Cells(a, 36) Then 'cou
+                    If Cells(9, 14) = Cells(a, 37) Then 'cou
+                        If Cells(4, 12) = Cells(a, 33) Then 'museau
+                            If Cells(4, 14) = Cells(a, 34) Then 'museau
+                                If Cells(9, 12) = Cells(a, 35) Then '8_cou
+                                    Cells(s, 32) = Cells(a, 29) 'ind
+                                    Cells(s, 33) = Sqr(Abs((((Cells(a, 38) - x) ^ 2) - ((Cells(a, 39) - y) ^ 2))))
+                                    i = 1
+                                    s = s + 1
+                                    a = a + 1
+                                    Else
+                                    a = a + 1
+                                End If
+                            Else
+                            a = a + 1
+                            End If
+                        Else
+                        a = a + 1
+                        End If
+                    Else
+                    a = a + 1
+                    End If
+                Else
+                a = a + 1
+                End If
+            Else
+            a = a + 1
+            End If
+            Else
+            a = a + 1
+        End If
+    
+Loop
+
+a = 150
+s = 6
+
+
+Do While Not IsEmpty(Cells(a, 29)) 'plus 1
+
+    
+        If Cells(2, 27) + 1 = Cells(a, 31) Then 'tache
+            If Cells(3, 13) = Cells(a, 32) Then 'nez
+                If Cells(9, 13) = Cells(a, 36) Then 'cou
+                    If Cells(9, 14) = Cells(a, 37) Then 'cou
+                        If Cells(4, 12) = Cells(a, 33) Then 'museau
+                            If Cells(4, 14) = Cells(a, 34) Then 'museau
+                                If Cells(9, 12) = Cells(a, 35) Then '8_cou
+                                    Cells(s, 34) = Cells(a, 29) 'ind
+                                    Cells(s, 35) = Sqr(Abs((((Cells(a, 38) - x) ^ 2) - ((Cells(a, 39) - y) ^ 2))))
+                                    i = 1
+                                    s = s + 1
+                                    a = a + 1
+                                    Else
+                                    a = a + 1
+                                End If
+                            Else
+                            a = a + 1
+                            End If
+                        Else
+                        a = a + 1
+                        End If
+                    Else
+                    a = a + 1
+                    End If
+                Else
+                a = a + 1
+                End If
+            Else
+            a = a + 1
+            End If
+            Else
+            a = a + 1
+        End If
+   
+Loop
+
+a = 150
+s = 6
+
+
+Do While Not IsEmpty(Cells(a, 29)) 'moins 1
+
+    
+        If Cells(2, 27) = Cells(a, 31) + 1 Then 'tache
+            If Cells(3, 13) = Cells(a, 32) Then 'nez
+                If Cells(9, 13) = Cells(a, 36) Then 'cou
+                    If Cells(9, 14) = Cells(a, 37) Then 'cou
+                        If Cells(4, 12) = Cells(a, 33) Then 'museau
+                            If Cells(4, 14) = Cells(a, 34) Then 'museau
+                                If Cells(9, 12) = Cells(a, 35) Then '8_cou
+                                    Cells(s, 36) = Cells(a, 29) 'ind
+                                    Cells(s, 37) = Sqr(Abs((((Cells(a, 38) - x) ^ 2) - ((Cells(a, 39) - y) ^ 2))))
+                                    i = 1
+                                    s = s + 1
+                                    a = a + 1
+                                    Else
+                                    a = a + 1
+                                End If
+                            Else
+                            a = a + 1
+                            End If
+                        Else
+                        a = a + 1
+                        End If
+                    Else
+                    a = a + 1
+                    End If
+                Else
+                a = a + 1
+                End If
+            Else
+            a = a + 1
+            End If
+            Else
+            a = a + 1
+        End If
+    
+Loop
+
+Range("AF6:AG140").Sort Key1:=Range("AG6")
+Range("AH6:AI140").Sort Key1:=Range("AI6")
+Range("AJ6:AK140").Sort Key1:=Range("AK6")
+
+
+'stop improvements
+Application.ScreenUpdating = True
+Application.Calculation = xlAutomatic
+Application.EnableEvents = True
+ActiveSheet.DisplayPageBreaks = True
+
+
+Sheets("new").Select
+End Sub
+Sub feuille()  'done
+Dim a As Integer
+Sheets("new").Activate
+a = Sheets("new").Cells(2, 32) 'numero de feuille
+
+Sheets.Add(After:=Sheets(a)).Name = a
+Sheets(a).Activate
+
+Sheets("new").Cells(2, 28).NumberFormat = "dd/MM/yyyy"
+Sheets(a).Cells(2, 28).NumberFormat = "dd/MM/yyyy"
+
+Sheets("new").Range("AA1:AD4").Copy
+ActiveSheet.Paste Destination:=Sheets(a + 1).Range("AA1:AD4") 'copie date, age et sexe
+
+
+Sheets("new").Range("AL1:AM2").Copy Destination:=Sheets(a + 1).Range("AE1:AF2") 'localisation
+
+
+Sheets("new").Range("A1:Z10").Copy
+ActiveSheet.Paste Destination:=Sheets(a + 1).Range("A1:Z10") 'copie modele salamandre
+
+
+Sheets("new").Cells(2, 34) = Sheets("new").Cells(2, 32)    'num dans salamandre
+Sheets("new").Cells(2, 32) = Sheets("new").Cells(2, 32) + 1     'num new +1
+
+Worksheets(a + 1).Columns("A:AE").AutoFit
+
+
+Sheets("new").Cells(149 + a, 29) = Sheets(a + 1).Name 'num individu
+
+Sheets("new").Cells(149 + a, 31) = Sheets("new").Cells(2, 27) 'tache
+Sheets("new").Cells(149 + a, 32) = Sheets("new").Cells(3, 13) 'nez
+Sheets("new").Cells(149 + a, 33) = Sheets("new").Cells(4, 12) 'nez gauche
+Sheets("new").Cells(149 + a, 34) = Sheets("new").Cells(4, 14) 'nez'droit
+Sheets("new").Cells(149 + a, 35) = Sheets("new").Cells(9, 12) 'cou 1
+Sheets("new").Cells(149 + a, 36) = Sheets("new").Cells(9, 13) 'cou 2
+Sheets("new").Cells(149 + a, 37) = Sheets("new").Cells(9, 14) 'cou 3
+Sheets("new").Cells(149 + a, 38) = Sheets("new").Cells(2, 38) 'x
+Sheets("new").Cells(149 + a, 39) = Sheets("new").Cells(2, 39) 'y
+
+Worksheets(a + 1).Select
+End Sub
+
+Sub maj()
+Dim i, j, b As Integer
+Dim a, x, y As Long
+
+b = 0
+a = Sheets("new").Cells(2, 31)
+x = Sheets("new").Cells(2, 38) 'x
+y = Sheets("new").Cells(2, 39) 'y
+
+
+
+Sheets("new").Activate
+Sheets(a + 1).Activate
+Sheets("new").Cells(2, 28).NumberFormat = "dd/MM/yyyy"
+i = Sheets("new").Cells(2, 28)
+j = 2
+
+While b < 1:
+    If IsEmpty(Sheets(a + 1).Cells(j, 28)) Then
+        Sheets(a + 1).Cells(j, 28).NumberFormat = "dd/MM/yyyy"
+        Sheets(a + 1).Cells(j, 28) = i
+        b = 1
+    
+    Else
+        j = j + 1
+
+    End If
+Wend
+
+b = 0
+j = 2
+
+While b < 1:
+    If IsEmpty(Sheets(a + 1).Cells(j, 31)) Then
+        Sheets(a + 1).Cells(j, 31) = x
+        b = 1
+    
+    Else
+        j = j + 1
+
+    End If
+Wend
+
+b = 0
+j = 2
+
+While b < 1:
+    If IsEmpty(Sheets(a + 1).Cells(j, 32)) Then
+        Sheets(a + 1).Cells(j, 32) = y
+        b = 1
+    
+    Else
+        j = j + 1
+
+    End If
+Wend
+
+
+Sheets("new").Cells(2, 34) = Sheets("new").Cells(2, 31)    'num dans salamandre
+End Sub
+Sub update()
+
+'improvements
+Application.ScreenUpdating = False
+Application.Calculation = xlManual
+Application.EnableEvents = False
+ActiveSheet.DisplayPageBreaks = False
+
+Dim i, j, a, b, k As Integer
+
+a = 2
+k = 1
+j = 150
+i = 0
+
+Sheets("new").Activate
+
+
+b = 0
+
+While FeuilleExiste(a - 1) = True:
+    Sheets("new").Cells(j + i, 29) = Worksheets(a).Name 'num individu
+        Sheets("new").Cells(j + i, 30) = Worksheets(a).Cells(4, 27) 'queue
+        Sheets("new").Cells(j + i, 31) = Worksheets(a).Cells(2, 27) 'tache
+        Sheets("new").Cells(j + i, 32) = Worksheets(a).Cells(3, 13) 'nez
+        Sheets("new").Cells(j + i, 33) = Worksheets(a).Cells(4, 12) 'nez gauche
+        Sheets("new").Cells(j + i, 34) = Worksheets(a).Cells(4, 14) 'nez'droit
+        Sheets("new").Cells(j + i, 35) = Worksheets(a).Cells(9, 12) 'cou 1
+        Sheets("new").Cells(j + i, 36) = Worksheets(a).Cells(9, 13) 'cou 2
+        Sheets("new").Cells(j + i, 37) = Worksheets(a).Cells(9, 14) 'cou 3
+        Sheets("new").Cells(j + i, 38) = Worksheets(a).Range("AE1").End(xlDown).Value 'x
+        Sheets("new").Cells(j + i, 39) = Worksheets(a).Range("AF1").End(xlDown).Value 'y
+        a = a + 1
+        i = i + 1
+Wend
+
+'stop improvements
+Application.ScreenUpdating = True
+Application.Calculation = xlAutomatic
+Application.EnableEvents = True
+ActiveSheet.DisplayPageBreaks = True
+
+End Sub
+
+Sub adapt()
+Dim a As Integer
+a = 3
+While FeuilleExiste(a) = True:
+Worksheets(a + 2).Columns("A:AE").AutoFit
+a = a + 1
+Wend
+End Sub
+
+
+Sub calcul_back()
+Application.ScreenUpdating = True
+Application.Calculation = xlAutomatic
+Application.EnableEvents = True
+ActiveSheet.DisplayPageBreaks = True
+
+End Sub
+
+Sub maj_loc()
+'improvements
+Application.ScreenUpdating = False
+Application.Calculation = xlManual
+Application.EnableEvents = False
+ActiveSheet.DisplayPageBreaks = False
+
+Workbooks("salamandre.xlsx").Sheets("Feuil1").Activate
+Workbooks("comparaison.xlsm").Sheets("new").Activate
+
+Dim a, b As Long
+a = 2
+b = 0
+
+Do While Not IsEmpty(Workbooks("salamandre.xlsx").Sheets("Feuil1").Cells(a, 71))
+    b = Workbooks("salamandre.xlsx").Sheets("Feuil1").Cells(a, 71) 'b = numero individu
+    Workbooks("comparaison.xlsm").Sheets("new").Cells(2, 1) = b
+    Workbooks("salamandre.xlsx").Sheets("Feuil1").Cells(a, 32).Copy Destination:=Workbooks("comparaison.xlsm").Sheets(b + 2).Cells(2, 31) 'x
+    Workbooks("salamandre.xlsx").Sheets("Feuil1").Cells(a, 33).Copy Destination:=Workbooks("comparaison.xlsm").Sheets(b + 2).Cells(2, 32) 'y
+
+a = a + 1
+Loop
+
+
+
+'stop improvements
+Application.ScreenUpdating = True
+Application.Calculation = xlAutomatic
+Application.EnableEvents = True
+ActiveSheet.DisplayPageBreaks = True
+End Sub
+
+Sub ajout()
+
+Workbooks("salamander.xlsm").Sheets("new").Activate
+
+Dim a, b As String
+Dim i, j, d, o, t, h, Finish As Integer
+Dim s As Integer
+Dim rng As Range
+
+a = Sheets("new").Range("AO2")
+b = Sheets("new").Range("AO4")
+Workbooks(a).Sheets(b).Activate
+
+Finish = 0
+
+
+i = 2
+j = 2
+
+d = Workbooks("salamander.xlsm").Sheets("new").Range("AO6") 'date position
+o = Workbooks("salamander.xlsm").Sheets("new").Range("AO8") 'observation number position
+t = Workbooks("salamander.xlsm").Sheets("new").Range("AO10") 'transect number position
+s = Workbooks("salamander.xlsm").Sheets("new").Range("AO16") 'ID individual position
+h = Workbooks("salamander.xlsm").Sheets("new").Range("AH2") 'ID individual
+
+
+Do While Not IsEmpty(Workbooks(a).Sheets(b).Cells(i, 1))
+    If Workbooks(a).Sheets(b).Cells(j, d) = Workbooks("salamander.xlsm").Sheets("new").Cells(2, 28) And _
+    Workbooks(a).Sheets(b).Cells(j, t) = Workbooks("salamander.xlsm").Sheets("new").Cells(2, 35) And _
+    Workbooks(a).Sheets(b).Cells(j, o) = Workbooks("salamander.xlsm").Sheets("new").Cells(2, 36) Then   'date puis transect puis num de photo
+        
+        Workbooks("salamander.xlsm").Sheets("new").Range("AH2").Copy _
+            Destination:=Workbooks(a).Sheets(b).Cells(j, s) 'numero salamandre
+        Workbooks("salamander.xlsm").Sheets("new").Cells(2, 36) = Workbooks("salamander.xlsm").Sheets("new").Cells(2, 36) + 1 ' +1
+        Finish = 1
+        Exit Do
+    Else
+    j = j + 1
+    
+        
+    End If
+    
+i = i + 1
+Loop
+
+If Finish >= 1 Then
+    GoTo Lable1
+Else
+MsgBox ("The date / transect ID / observation don't fit between the salamander table and the data sheet")
+
+End If
+
+Lable1:
+Finish = 12
+
+End Sub
+
+
